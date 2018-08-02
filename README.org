@@ -1,0 +1,127 @@
+#+TITLE: My Go Notes
+
+* The Go Programming Language
+** Questions
+   - Why does Go not has package versions?
+   - Why there is an extensive usage of =nil=?
+** Spacemacs mode
+*** Keybinding
+| Key Binding | Description                                                                           |
+| ~SPC m h h~  | godoc at point                                                                        |
+| ~SPC m i g~ | goto imports                                                                          |
+| ~SPC m i a~ | add import                                                                            |
+| ~SPC m i r~ | remove unused import                                                                  |
+| ~SPC m e b~ | go-play buffer                                                                        |
+| ~SPC m e r~ | go-play region                                                                        |
+| ~SPC m e d~ | download go-play snippet                                                              |
+| ~SPC m x x~ | run “go run” for the current ‘main’ package                                           |
+| ~SPC m g a~ | jump to matching test file or back from test to code file                             |
+| ~SPC m g c~ | open a clone of the current buffer with a coverage info (go tool cover -h for help)   |
+| ~SPC m g g~ | go jump to definition                                                                 |
+| ~SPC m r n~ | go rename                                                                             |
+| ~SPC m t p~ | run “go test” for the current package                                                 |
+| ~SPC m t P~ | run “go test” for the current package and all packages under it                       |
+| ~SPC m t t~ | run “go test” for the function you’re currently in (while you’re in a _.test.go file) |
+| ~SPC m t s~ | run “go test” for the suite you’re currently in (requires gocheck)                    |
+** Notes
+   - There are no class hierarchies
+   - There are no classes
+   - "complexity is multiplicative"
+   - The go standard library has over 100 packages for common tasks.
+   - The basic keywords are
+     - func
+     - var
+     - const
+     - type
+   - The opening brace { of the function must be on the same line as the end of
+     the =func= declaration, not on a line by it self.
+   - In the expression x + y a, a new line is permitted after but not before the + operator
+   - The for loop is the only loop statement in Go. 
+   - The *blank identifier*, whose name is =_= may be used whenever syntax
+     requires a variable name but program logic does not.
+   - Maps (or hashes in perl, or dicts in python)
+     #+BEGIN_SRC go
+     counts := make(map[string]int)
+
+     input := bufio.NewScanner(os.Stdin)
+	   for input.Scan() {
+		    counts[input.Text()]++
+	   }
+
+     for line, n := range counts {
+	    	if n > 1 {
+			      fmt.Printf("%d\t%s\n", n, line)
+		    }
+     }
+     #+END_SRC
+     - A map holds a set of key/value pairs and provides constant-time
+       operations to store, retrieve or test for an item in the set.
+     - The key may be of any type whose values can be compared with == 
+     - The value may be of any type.
+   - The =bufio= package helps to make input and output efficient and
+     convenient. One of its most useful features is a type called =Scanner= that
+     reads input and breaks it into lines or words; it's often the easiest way
+     to process input that comes naturally in lines.
+   - =Printf= has over a dozen such conversions, which Go programmers call
+     *verbs*. This table is far from a complete specification but illustrates
+     many of the features that are available.
+
+     | Conversion | Description                                                    |
+     |------------+----------------------------------------------------------------|
+     | %d         | decimal integer                                                |
+     | %x, %o, %b | integer in hexadecimal, octal, binary                          |
+     | %f, %g, %e | floating-point number: 3.141593 3.141592653589793 3.141593e+00 |
+     | %t         | boolean: =true= or =false=                                     |
+     | %c         | rune (Unicode code point)                                      |
+     | %s         | string                                                         |
+     | %q         | quoted string "abc" or rune 'c'                                |
+     | %v         | any value in a natural format                                  |
+     | %T         | type of any value                                              |
+     | %%         | literal percent sign (no operand)                              |
+
+   - By convention, formatting functions whose names end in =f=, such as
+     =log.Printf= and =fmt.Errorf= use the formatting rules of =fmt.Printf=.
+   - Formatting functions whose names end in =ln= follow =Println=, formatting
+     their arguments as if by =%v=, followed by a new line.
+   - The function =os.Open= returns two values. The first is an open file
+     (=*os.File=). The second result is a value of the built-in =error= type. If
+     =err= equals the special built-in value =nil=, the file was opened
+     successfully.
+   - A =map= is a *reference* to the data structure created by =make=. When a
+     map is passed to a function, the function receives a copy of the reference,
+     so any changes the called functions makes to the underlying data structure
+     will be visible through the caller's map reference too. In our example, the
+     values inserted into the =counts= map by =countLines= are seen by =main=
+     #+BEGIN_SRC go
+func main() {
+	counts := make(map[string]int)
+	files := os.Args[1:]
+	if len(files) == 0 {
+		countLines(os.Stdin, counts)
+	} else {
+		for _, arg := range files {
+			f, err := os.Open(arg)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "dup2: %v\n", err)
+				continue
+			}
+			countLines(f, counts)
+			f.Close()
+		}
+	}
+	for line, n := range counts {
+		if n > 1 {
+			fmt.Printf("%d\t%s\n", n, line)
+		}
+	}
+}
+
+func countLines(f *os.File, counts map[string]int) {
+	input := bufio.NewScanner(f)
+	for input.Scan() {
+		counts[input.Text()]++
+	}
+	// NOTE: ignoring potential errors from input.Err()
+}
+     #+END_SRC
+   - =ReadFile= reads the entire content of a named file.
