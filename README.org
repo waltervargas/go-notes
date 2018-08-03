@@ -4,7 +4,19 @@
 ** Questions
    - Why does Go not has package versions?
    - Why there is an extensive usage of =nil=?
-** Spacemacs mode
+** Spacemacs
+*** Spacemacs configuration for Go
+    #+BEGIN_SRC lisp
+   dotspacemacs-configuration-layers
+   '(
+     ;; ...
+     (go :variables
+         go-use-gometalinter t
+         go-tab-width 4
+         gofmt-before-save t
+         gofmt-command "goimports")
+     )
+    #+END_SRC
 *** Keybinding
 | Key Binding | Description                                                                           |
 | ~SPC m h h~  | godoc at point                                                                        |
