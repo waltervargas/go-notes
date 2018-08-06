@@ -6,7 +6,7 @@
    - Why there is an extensive usage of =nil=?
 ** Spacemacs
 *** Spacemacs configuration for Go
-    #+BEGIN_SRC lisp
+    #+BEGIN_SRC elisp
    dotspacemacs-configuration-layers
    '(
      ;; ...
@@ -137,3 +137,58 @@ func countLines(f *os.File, counts map[string]int) {
 }
      #+END_SRC
    - =ReadFile= reads the entire content of a named file.
+
+   - Concurrent Programming
+     - A goroutine is a concurrent function execution.
+     - A channel is a communication mechanism that allows one goroutine to pass
+       values of a specified type to another goroutine.
+     - When one goroutine attempts a send or receive on a channel, it blocks
+       until another goroutine attempts the corresponding receive or send
+       operation, at which point the value is transferred and both goroutines
+       proceed.
+     - Tue function =main= runs in a goroutine and the =go= statement creates
+       additional goroutines.
+     - Example =fetchall.go=
+       #+BEGIN_SRC go
+package main
+
+import (
+	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"time"
+)
+
+func main() {
+	start := time.Now()
+	ch := make(chan string)
+	for _, url := range os.Args[1:] {
+		go fetch(url, ch) // start a gorutine
+	}
+	for range os.Args[1:] {
+		fmt.Println(<-ch) // receive from channel ch
+	}
+	fmt.Printf("%.2fs elapsed\n", time.Since(start).Seconds())
+}
+
+func fetch(url string, ch chan<- string) {
+	start := time.Now()
+	resp, err := http.Get(url)
+	if err != nil {
+		ch <- fmt.Sprint(err) // send to channel ch
+		return
+	}
+
+	nbytes, err := io.Copy(ioutil.Discard, resp.Body)
+	resp.Body.Close() // don't leak resources
+	if err != nil {
+		ch <- fmt.Sprintf("while reading %s: %v", url, err)
+		return
+	}
+	secs := time.Since(start).Seconds()
+	ch <- fmt.Sprintf("%.2fs %7d %s", secs, nbytes, url)
+}
+       #+END_SRC
+
