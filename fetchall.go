@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -26,6 +27,11 @@ func main() {
 
 func fetch(url string, ch chan<- string, file_name string) {
 	start := time.Now()
+
+	if !strings.HasPrefix(url, "http://") {
+		url = "http://" + url
+	}
+
 	resp, err := http.Get(url)
 	if err != nil {
 		ch <- fmt.Sprint(err) // send to channel ch
