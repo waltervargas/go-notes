@@ -41,11 +41,11 @@
    - "complexity is multiplicative"
    - The go standard library has over 100 packages for common tasks.
    - The basic keywords are
-     - func
-     - var
-     - const
-     - type
-   - The opening brace { of the function must be on the same line as the end of
+     - =func=
+     - =var=
+     - =const=
+     - =type=
+   - The opening brace ={= of the function must be on the same line as the end of
      the =func= declaration, not on a line by it self.
    - In the expression x + y a, a new line is permitted after but not before the + operator
    - The for loop is the only loop statement in Go. 
@@ -191,4 +191,44 @@ func fetch(url string, ch chan<- string) {
 	ch <- fmt.Sprintf("%.2fs %7d %s", secs, nbytes, url)
 }
        #+END_SRC
-
+   - Control Flow
+     - switch
+       #+BEGIN_SRC go
+switch coinflip() {
+ case "heads":
+      heads++
+ case "tails":
+      tails++
+ default: 
+      fmt.Println("landed on edge!")
+}
+       #+END_SRC
+     - Cases are evaluated from top to bottom, so the first matching is executed
+     - The optional default case matches if none of the other cases does, it may
+       placed anywhere.
+     - A =switch= does not need an operand; it can just list the cases, each of
+       which is a boolean expression:
+       #+BEGIN_SRC go
+func Signum(x int) int {
+ switch {
+ case x > 0:
+   return +1
+ default:
+   return 0
+ case x < 0:
+   return -1
+ }
+}
+       #+END_SRC
+     - This form is called a tagless switch, it's equivalent to switch true.
+   - Pointers
+     - There is no pointer arithmetic
+     - The =&= operator yields the address of a variable.
+     - The =*= operator retrieves the variable that the pointer refers to.
+   - Methods and Interfaces
+     - A method is a function associated with a named type
+     - Interfaces are abstract types that let us treat different concrete types
+       in the same way based on what methods they have.
+   - Packages
+     - There is an index of the standard library packages at https://golang.org/pkg
+       
