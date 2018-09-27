@@ -231,4 +231,21 @@ func Signum(x int) int {
        in the same way based on what methods they have.
    - Packages
      - There is an index of the standard library packages at https://golang.org/pkg
+   - Names
+     - The case if the first letter of a name determines its visibility across package bundaries.
+       - If the name begins with an upper-case letter, it is exported, which
+         means that it is vissible and accessible outside of its own package and
+         may be referred to by other parts of the program, as with =Printf= in the =fmt= package.
+       - Packages names themselves are always in lower case.
+     - There is no limit on name length, but convention and style in Go programs
+       lean toward short names, specially for local variables with small scopes,
+       you are much more likely to see variables named =i= than =theLoopIndex=.
+     - Generally, the larger the scope of a name, the longer and more maningful
+       it should be.
+     - Stylistically, Gophers use "camel case" when forming names by combining
+       words; Thus the standard libraries have functions with names like
+       =QuoteRuneToASCII= and =parseRequestLine= but never =quote_rune_to_ASCII=. 
+     - The letters of acronyms and initialisms like ASCII and HTML are always
+       rendered in the same case, so a function might be called =htmlEscape=,
+       =HTMLExcape=, or =escapeHTML=, but not =escape-Html=,
        
